@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CDN Endpoint - 이미지 호스팅 서비스</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      height: 100%;
+    }
+    body {
+      min-height: 100vh;
+      background-color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', 'Noto Sans KR', sans-serif;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      color: #000000;
+    }
+    /* 배경 광원 */
+    .bg-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -60%);
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 107, 0, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    /* 본문 컨테이너 */
+    .container {
+      position: relative;
+      text-align: center;
+      max-width: 640px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .container.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* CI 로고마크 */
+    .logo {
+      display: block;
+      width: 48px;
+      height: 38px;
+      margin: 0 auto 1.5rem;
+    }
+    /* 구분선 */
+    .divider {
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(to bottom, #FF6B00, transparent);
+      margin: 0 auto 2.5rem;
+    }
+    /* 상태 뱃지 */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 107, 0, 0.08);
+      border: 1px solid rgba(255, 107, 0, 0.2);
+      border-radius: 20px;
+      margin-bottom: 1.5rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #FF6B00;
+      letter-spacing: 0.05em;
+    }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: #FF6B00;
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    /* 메인 타이틀 */
+    .title {
+      font-size: clamp(1.75rem, 5vw, 2.5rem);
+      font-weight: 700;
+      color: #000000;
+      margin: 0 0 0.75rem;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    .title .highlight {
+      background: linear-gradient(135deg, #FF6B00 30%, #e65300 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    /* 영문 서브타이틀 */
+    .subtitle-en {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(0.75rem, 2vw, 0.875rem);
+      font-weight: 400;
+      color: rgba(0, 0, 0, 0.35);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 0 0 2rem;
+    }
+    /* 설명 텍스트 */
+    .description {
+      font-size: 0.95rem;
+      font-weight: 400;
+      color: rgba(0, 0, 0, 0.65);
+      line-height: 1.8;
+      margin: 0 0 2.5rem;
+    }
+    /* 정보 카드 */
+    .info-card {
+      background: rgba(0, 0, 0, 0.02);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 0 0 2rem;
+      text-align: left;
+    }
+    .info-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    .info-label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.5);
+      letter-spacing: 0.03em;
+    }
+    .info-value {
+      font-family: 'Inter', monospace;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #000000;
+      background: rgba(255, 107, 0, 0.08);
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+    }
+    /* 안내 메시지 */
+    .notice {
+      background: rgba(255, 107, 0, 0.05);
+      border-left: 3px solid #FF6B00;
+      padding: 1rem 1.25rem;
+      margin: 0 0 2.5rem;
+      text-align: left;
+      border-radius: 4px;
+    }
+    .notice-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #FF6B00;
+      margin: 0 0 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .notice-text {
+      font-size: 0.85rem;
+      color: rgba(0, 0, 0, 0.7);
+      line-height: 1.6;
+      margin: 0;
+    }
+    /* 문서 링크 */
+    .doc-link {
+      display: inline-block;
+      padding: 0.75rem 2.25rem;
+      background: transparent;
+      color: #FF6B00;
+      border: 1px solid #FF6B00;
+      border-radius: 4px;
+      font-family: 'Inter', 'Noto Sans KR', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+    .doc-link:hover {
+      background: linear-gradient(135deg, #FF6B00, #e65300);
+      color: #ffffff;
+    }
+    /* 하단 워터마크 */
+    .watermark {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Inter', monospace;
+      font-size: 0.7rem;
+      color: rgba(0, 0, 0, 0.12);
+      letter-spacing: 0.15em;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 1s ease 0.8s;
+    }
+    .watermark.visible {
+      opacity: 1;
+    }
+    /* 반응형 */
+    @media (max-width: 640px) {
+      .info-card {
+        padding: 1.25rem;
+      }
+      .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 배경 광원 -->
+  <div class="bg-glow"></div>
+  
+  <!-- 본문 컨테이너 -->
+  <div class="container" id="container">
+    <!-- CI 로고마크 -->
+    <svg class="logo" viewBox="0 0 60 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- M 외곽 -->
+      <path d="M4 44 L4 8 L30 34 L56 8 L56 44"
+            stroke="#FF6B00" stroke-width="5"
+            stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <!-- V 내부 -->
+      <path d="M14 18 L30 36 L46 18"
+            stroke="#e65300" stroke-width="3"
+            stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9"/>
+    </svg>
+    
+    <!-- 구분선 -->
+    <div class="divider"></div>
+    
+    <!-- 상태 뱃지 -->
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      <span>OPERATIONAL</span>
+    </div>
+    
+    <!-- 메인 타이틀 -->
+    <h1 class="title">
+      <span class="highlight">CDN Endpoint</span> 안내
+    </h1>
+    
+    <!-- 영문 서브타이틀 -->
+    <p class="subtitle-en">Content Delivery Network Endpoint</p>
+    
+    <!-- 설명 -->
+    <p class="description">
+      이 도메인은 이미지 호스팅을 위한 CDN 엔드포인트로 운영되고 있습니다.<br />
+      직접 접속이 아닌 리소스 경로를 통해 콘텐츠에 접근하실 수 있습니다.
+    </p>
+    
+    <!-- 정보 카드 -->
+    <div class="info-card">
+      <div class="info-row">
+        <span class="info-label">서비스 유형</span>
+        <span class="info-value">Image Hosting CDN</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">프로토콜</span>
+        <span class="info-value">HTTPS/2</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">접근 방식</span>
+        <span class="info-value">Direct URL Path</span>
+      </div>
+    </div>
+    
+    <!-- 안내 메시지 -->
+    <div class="notice">
+      <div class="notice-title">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="7" r="6" stroke="#FF6B00" stroke-width="1.5"/>
+          <path d="M7 4V7.5M7 10V10.5" stroke="#FF6B00" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        사용 안내
+      </div>
+      <p class="notice-text">
+        이미지는 <strong>도메인/경로/파일명</strong> 형식으로 접근 가능합니다.<br />
+        루트 경로에는 브라우징 가능한 콘텐츠가 제공되지 않습니다.
+      </p>
+    </div>
+    
+    <!-- 문서 링크 (필요시 활성화) -->
+    <!-- <a href="/docs" class="doc-link">사용 문서 보기</a> -->
+  </div>
+  
+  <!-- 하단 워터마크 -->
+  <p class="watermark" id="watermark">CDN · ENDPOINT · IMAGE HOSTING</p>
+  
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      setTimeout(function () {
+        document.getElementById('container').classList.add('visible');
+        document.getElementById('watermark').classList.add('visible');
+      }, 50);
+    });
+  </script>
+</body>
+</html>
