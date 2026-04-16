@@ -82,6 +82,9 @@
             align-items: center;
             color: white;
             position: relative;
+            /* 해결책: 자식 요소에 직접 둥근 모서리 적용 (왼쪽 위, 왼쪽 아래) */
+            border-radius: 20px 0 0 20px; 
+            overflow: hidden; /* 자식 요소 내부의 장식 원형도 깔끔하게 잘리도록 추가 */
         }
 
         .login-image::before {
@@ -317,6 +320,8 @@
 
             .login-image {
                 padding: 50px 30px;
+                /* 모바일 배치에서는 위쪽 두 모서리에만 둥근 모서리 적용 */
+                border-radius: 20px 20px 0 0;
             }
 
             .login-form-wrapper {
@@ -358,6 +363,8 @@
 
             .login-image {
                 padding: 35px 25px;
+                /* 모바일 배치에서는 위쪽 두 모서리에만 둥근 모서리 적용 */
+                border-radius: 20px 20px 0 0;
             }
 
             .login-image::before {
@@ -477,6 +484,8 @@
 
             .login-image {
                 padding: 30px 20px;
+                /* 모바일 배치에서는 위쪽 두 모서리에만 둥근 모서리 적용 */
+                border-radius: 20px 20px 0 0;
             }
 
             .company-logo {
@@ -532,6 +541,8 @@
 
             .login-image {
                 padding: 25px 20px;
+                /* 모바일 배치에서는 위쪽 두 모서리에만 둥근 모서리 적용 */
+                border-radius: 20px 20px 0 0;
             }
 
             .company-logo {
