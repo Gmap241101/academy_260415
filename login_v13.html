@@ -38,7 +38,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: url('https://images.recruit.kro.kr/login/login_background.png'); /* linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, var(--accent) 100%); */
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, var(--accent) 100%);
             min-height: 100vh;
             min-height: 100dvh;
             display: flex;
@@ -98,7 +98,8 @@
 
         .login-image {
             flex: 1;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            /* background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); */
+            background: url('https://images.recruit.kro.kr/login/login_background.png');
             padding: 56px 40px;
             display: flex;
             flex-direction: column;
