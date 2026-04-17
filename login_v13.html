@@ -98,8 +98,11 @@
 
         .login-image {
             flex: 1;
-            /* background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); */
-            background: url('https://images.recruit.kro.kr/login/login_background.png');
+            background: url('https://images.recruit.kro.kr/login/login_background.png'); /* background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); */
+            background-size: cover;
+            background-position: center; /* 인물의 얼굴이 위치한 오른쪽을 기준으로 배치 */
+            background-repeat: no-repeat;
+            
             padding: 56px 40px;
             display: flex;
             flex-direction: column;
