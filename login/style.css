@@ -458,7 +458,7 @@
             .brand-content {
                 left: 30px;
                 bottom: 42px;
-                max-width: 250px;
+		    	max-width: none;
             }
 
             .login-form-wrapper {
