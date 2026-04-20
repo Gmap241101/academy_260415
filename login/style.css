@@ -132,8 +132,8 @@
         }
 
         .company-logo {
-            width: 100px;
-            height: 100px;
+            width: 100px; /*120px*/
+            height: 100px; /*120px*/
             background: var(--white);
             border-radius: 50%;
             display: flex;
@@ -147,8 +147,8 @@
         }
 
         .company-logo svg { /*svg */
-            width: 60px;
-            height: 60px;
+            width: 60px; /*70px*/
+            height: 60px; /*70px*/
 		    object-fit: contain;
 		    display: block
         }
