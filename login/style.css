@@ -148,6 +148,8 @@
         .company-logo img { /*svg */
             width: 70px;
             height: 70px;
+		    object-fit: contain;
+		    display: block
         }
 
         .login-image h1 {
@@ -539,6 +541,8 @@
             .company-logo img { /* svg */
                 width: 40px;
                 height: 40px;
+			    object-fit: contain;
+			    display: block
             }
 
             .login-image h1 {
@@ -679,6 +683,8 @@
             .company-logo img { /* svg */
                 width: 36px;
                 height: 36px;
+			    object-fit: contain;
+			    display: block
             }
 
             .brand-text-panel {
@@ -757,6 +763,8 @@
             .company-logo img { /* svg */
                 width: 40px;
                 height: 40px;
+			    object-fit: contain;
+			    display: block
             }
 
             .login-image h1 {
