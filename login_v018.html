@@ -215,6 +215,19 @@
 			-webkit-backdrop-filter: blur(3px);
 		}
 
+		.brand-subtitle {
+		    display: block;
+		}
+		
+		.brand-slogan {
+		    display: block;
+		    white-space: nowrap;
+		    word-break: keep-all;
+		    font-size: clamp(9.5px, 1.05vw, 13px);
+		    line-height: 1.35;
+		    letter-spacing: -0.02em;
+		}
+
         .login-form-wrapper {
             flex: 1;
             padding: 48px 44px;
@@ -828,7 +841,10 @@
                 </div>
 				<div class="brand-text-panel">
 					<h1>채용컨설팅센터</h1>
-					<p>HR Consulting Center<br />성공적인 채용을 위한 최적의 솔루션</p>
+					<p>
+						<span class="brand-subtitle">HR Consulting Center</span><br>
+						<span class="brand-slogan">성공적인 채용을 위한 최적의 솔루션</span>
+					</p>
 				</div>
             </div>
         </section>
