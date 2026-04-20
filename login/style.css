@@ -124,10 +124,11 @@
             bottom: 48px;
             z-index: 1;
             display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            text-align: left;
-            max-width: 260px;
+            flex-direction: row;
+		    align-items: center;
+		    text-align: center;
+		    gap: 12px;
+		    max-width: none;
         }
 
         .company-logo {
