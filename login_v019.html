@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>인사팀 인트라넷 로그인</title>
+    <style>
+        :root {
+            --primary: #1e3c72;
+            --primary-light: #2a5298;
+            --accent: #ff6b35;
+            --accent-light: #ff8c5a;
+            --text-main: #333333;
+            --text-sub: #666666;
+            --border: #e0e0e0;
+            --border-focus: #2a5298;
+            --danger: #ff3b30;
+            --white: #ffffff;
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.2);
+            --shadow-accent: 0 10px 20px rgba(255, 107, 53, 0.3);
+            --shadow-primary: 0 8px 15px rgba(30, 60, 114, 0.3);
+            --radius-xl: 20px;
+            --radius-lg: 15px;
+            --radius-md: 8px;
+            --transition: 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            color-scheme: light;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 50%, var(--accent) 100%);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 20px;
+            color: var(--text-main);
+        }
+
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        .bg-decoration {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .bg-decoration::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: rgba(255, 107, 53, 0.1);
+            border-radius: 50%;
+            top: -200px;
+            right: -200px;
+        }
+
+        .bg-decoration::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: rgba(30, 60, 114, 0.2);
+            border-radius: 50%;
+            bottom: -150px;
+            left: -150px;
+        }
+
+        .login-container {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            width: min(900px, 100%);
+            display: flex;
+            position: relative;
+            z-index: 1;
+            margin: auto;
+            background-clip: padding-box;
+        }
+
+        .login-image {
+            flex: 1;
+            background: url('https://images.recruit.kro.kr/login/login_background.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            padding: 56px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--white);
+            position: relative;
+            border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+            overflow: visible;
+        }
+
+        .login-image::before {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 107, 53, 0.2);
+            border-radius: 50%;
+            top: -50px;
+            right: -50px;
+        }
+
+        /* 수정: 로고+텍스트를 하나의 블록으로 묶어 이미지 안전영역(좌하단)에 배치 */
+        .brand-content {
+            position: absolute;
+            left: 40px;
+            bottom: 48px;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+            max-width: 260px;
+        }
+
+        .company-logo {
+            width: 120px;
+            height: 120px;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 26px;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+        }
+
+        .company-logo svg {
+            width: 70px;
+            height: 70px;
+        }
+
+        .login-image h1 {
+            font-size: 28px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+			text-shadow:
+				0 2px 6px rgba(0, 0, 0, 0.38),
+				0 8px 18px rgba(0, 0, 0, 0.22);
+        }
+
+        .login-image p {
+            font-size: 14px;
+            opacity: 0.92;
+            text-align: center;
+            line-height: 1.55;
+            position: relative;
+            z-index: 1;			
+			text-shadow:
+				0 1px 4px rgba(0, 0, 0, 0.34),
+				0 6px 14px rgba(0, 0, 0, 0.18);
+        }
+
+        /* 수정: brand-content 안에서는 좌측 정렬 */
+        .brand-content .company-logo {
+            margin-bottom: 22px;
+        }
+
+        .brand-content h1,
+        .brand-content p {
+            text-align: center;
+        }
+
+		.brand-text-panel {
+			display: inline-block;
+			max-width: 320px;
+			padding: 16px 18px 15px;
+			border-radius: 14px;
+			background:
+				repeating-linear-gradient(
+					135deg,
+					rgba(128, 128, 128, 0.125) 0px,
+					rgba(128, 128, 128, 0.125) 2px,
+					transparent 2px,
+					transparent 8px
+				),
+				linear-gradient(
+					180deg,
+					rgba(18, 28, 46, 0.62) 0%,
+					rgba(18, 28, 46, 0.54) 100%
+				);
+			border: 1px solid rgba(255, 255, 255, 0.10);
+			box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+			backdrop-filter: blur(3px);
+			-webkit-backdrop-filter: blur(3px);
+		}
+
+		.brand-subtitle {
+		    display: block;
+		}
+		
+		.brand-slogan {
+		    display: block;
+		    white-space: nowrap;
+		    word-break: keep-all;
+		    font-size: clamp(9.5px, 1.05vw, 13px);
+		    line-height: 1.35;
+		    letter-spacing: -0.02em;
+		}
+
+        .login-form-wrapper {
+            flex: 1;
+            padding: 48px 44px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-form-wrapper h2 {
+            color: var(--primary);
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .login-form-wrapper .subtitle {
+            color: var(--text-sub);
+            margin-bottom: 32px;
+            font-size: 14px;
+            line-height: 1.45;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group:last-of-type {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 1.35;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            transition: border-color var(--transition), box-shadow var(--transition), background-color var(--transition);
+            outline: none;
+            color: var(--text-main);
+            background: var(--white);
+        }
+
+        .form-group input::placeholder {
+            color: #a8a8a8;
+        }
+
+        .form-group input:hover {
+            border-color: #cfcfcf;
+        }
+
+        .form-group input:focus,
+        .form-group input:focus-visible {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.12);
+        }
+
+        .form-group input[aria-invalid="true"] {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.12);
+        }
+
+        .field-error {
+            min-height: 16px;
+            margin-top: 6px;
+            color: var(--danger);
+            font-size: 12px;
+            line-height: 1.35;
+            visibility: hidden;
+        }
+
+        .field-error.active {
+            visibility: visible;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition), filter var(--transition);
+            margin-top: 4px;
+            min-height: 52px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-accent);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-btn:focus-visible,
+        .modal-close-btn:focus-visible {
+            outline: 3px solid rgba(42, 82, 152, 0.22);
+            outline-offset: 3px;
+        }
+
+        .login-btn[disabled] {
+            cursor: not-allowed;
+            opacity: 0.82;
+            transform: none;
+            box-shadow: none;
+            filter: saturate(0.9);
+        }
+
+        .help-text {
+            text-align: center;
+            margin-top: 16px;
+            color: var(--text-sub);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .help-text strong {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* 모달 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease;
+            text-align: center;
+        }
+
+        .modal-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 25px;
+        }
+
+        .modal-icon svg {
+            width: 35px;
+            height: 35px;
+            stroke: var(--white);
+        }
+
+        .modal-content h3 {
+            color: var(--primary);
+            font-size: 22px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .modal-content p {
+            color: var(--text-sub);
+            line-height: 1.75;
+            margin-bottom: 30px;
+            font-size: 15px;
+        }
+
+        .modal-close-btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--white);
+            border: none;
+            padding: 12px 40px;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform var(--transition), box-shadow var(--transition);
+            min-height: 48px;
+        }
+
+        .modal-close-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-primary);
+        }
+
+        .modal-close-btn:active {
+            transform: translateY(0);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* 태블릿 */
+        @media (max-width: 1024px) {
+            .login-container {
+                width: 95%;
+            }
+
+            .login-image {
+                padding: 48px 30px;
+                border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+            }
+
+            /* 수정: 태블릿에서도 브랜드 블록만 위치 보정 */
+            .brand-content {
+                left: 30px;
+                bottom: 42px;
+                max-width: 240px;
+            }
+
+            .login-form-wrapper {
+                padding: 42px 36px;
+            }
+        }
+
+        /* 모바일 */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+                min-height: 100vh;
+                min-height: 100dvh;
+                padding-top: 24px;
+                padding-bottom: 24px;
+            }
+
+            .bg-decoration::before {
+                width: 300px;
+                height: 300px;
+                top: -100px;
+                right: -100px;
+            }
+
+            .bg-decoration::after {
+                width: 250px;
+                height: 250px;
+                bottom: -100px;
+                left: -100px;
+            }
+
+            .login-container {
+                flex-direction: column;
+                width: 100%;
+                max-width: 500px;
+                margin: auto;
+            }
+
+            .login-image {
+                padding: 32px 25px;
+                border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+                min-height: 260px;
+                justify-content: flex-end;
+            }
+
+            .login-image::before {
+                width: 150px;
+                height: 150px;
+                top: -40px;
+                right: -40px;
+            }
+
+            /* 수정: 모바일에서는 아래 여백에 맞춰 브랜드 블록 위치만 재배치 */
+            .brand-content {
+                position: absolute;
+                left: 18px;
+                right: 18px;
+                bottom: 18px;
+                margin-top: 0;
+                margin-bottom: 0;
+                display: flex;
+                flex-direction: row;
+                align-items: flex-end;
+                justify-content: flex-start;
+                gap: 12px;
+                max-width: none;
+                text-align: left;
+            }
+
+            .brand-content h1,
+            .brand-content p {
+                text-align: center;
+            }
+
+            .company-logo {
+                width: 72px;
+                height: 72px;
+                margin-bottom: 18px;
+            }
+
+            .company-logo svg {
+                width: 40px;
+                height: 40px;
+            }
+
+            .login-image h1 {
+                font-size: 22px;
+                margin-bottom: 8px;
+            }
+
+            .login-image p {
+                font-size: 14px;
+            }
+
+            .brand-text-panel {
+                max-width: calc(100% - 84px);
+            }
+
+            .brand-text-panel h1 {
+                font-size: 20px;
+                margin-bottom: 6px;
+            }
+        
+            .brand-text-panel p {
+                font-size: 12px;
+                line-height: 1.4;
+            }
+
+            .login-form-wrapper {
+                padding: 30px 24px;
+            }
+
+            .login-form-wrapper h2 {
+                font-size: 26px;
+                margin-bottom: 8px;
+            }
+
+            .login-form-wrapper .subtitle {
+                font-size: 13px;
+                margin-bottom: 26px;
+            }
+
+            .form-group {
+                margin-bottom: 12px;
+            }
+
+            .form-group label {
+                font-size: 13px;
+                margin-bottom: 5px;
+            }
+
+            .form-group input {
+                padding: 13px;
+                font-size: 14px;
+            }
+
+            .field-error {
+                min-height: 15px;
+                font-size: 11px;
+                margin-top: 5px;
+            }
+
+            .login-btn {
+                padding: 14px;
+                font-size: 15px;
+                margin-top: 4px;
+            }
+
+            .help-text {
+                margin-top: 14px;
+                font-size: 12px;
+                line-height: 1.45;
+            }
+
+            .modal-overlay {
+                padding: 15px;
+                align-items: center;
+            }
+
+            .modal-content {
+                padding: 30px 25px;
+                max-width: 100%;
+            }
+
+            .modal-icon {
+                width: 60px;
+                height: 60px;
+                margin-bottom: 20px;
+            }
+
+            .modal-icon svg {
+                width: 30px;
+                height: 30px;
+            }
+
+            .modal-content h3 {
+                font-size: 19px;
+                margin-bottom: 15px;
+            }
+
+            .modal-content p {
+                font-size: 14px;
+                line-height: 1.7;
+                margin-bottom: 25px;
+            }
+
+            .modal-close-btn {
+                width: 100%;
+                padding: 12px 35px;
+                font-size: 14px;
+            }
+        }
+
+        /* 소형 모바일 */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+                padding-top: 18px;
+                padding-bottom: 18px;
+            }
+
+            .login-image {
+                min-height: 230px;
+                padding: 24px 18px;
+            }
+
+            /* 수정: 소형 모바일 위치 미세 조정 */
+            .brand-content {
+                max-width: 100%;
+                left: 16px;
+                right: 16px;
+                bottom: 16px;
+                gap: 10px;
+            }
+
+            .company-logo {
+                width: 64px;
+                height: 64px;
+            }
+
+            .company-logo svg {
+                width: 36px;
+                height: 36px;
+            }
+
+            .brand-text-panel {
+                max-width: calc(100% - 74px);
+                padding: 12px 14px;
+            }
+        
+            .brand-text-panel h1 {
+                font-size: 18px;
+            }
+        
+            .brand-text-panel p {
+                font-size: 11px;
+                line-height: 1.35;
+            }
+
+            .login-image h1 {
+                font-size: 20px;
+            }
+
+            .login-image p {
+                font-size: 13px;
+            }
+
+            .login-form-wrapper {
+                padding: 26px 20px;
+            }
+
+            .login-form-wrapper h2 {
+                font-size: 24px;
+            }
+
+            .login-form-wrapper .subtitle {
+                font-size: 12px;
+                margin-bottom: 26px;
+            }
+
+            .modal-content {
+                padding: 25px 20px;
+            }
+
+            .modal-content h3 {
+                font-size: 17px;
+            }
+
+            .modal-content p {
+                font-size: 13px;
+            }
+        }
+
+        /* 모바일 가로모드 */
+        @media (max-width: 768px) and (orientation: landscape) {
+            body {
+                align-items: center;
+                padding-top: 12px;
+                padding-bottom: 12px;
+            }
+
+            .login-image {
+                padding: 24px 20px;
+            }
+
+            /* 수정: 가로모드에서도 브랜드 블록만 위치 보정 */
+            .brand-content {
+                left: 20px;
+                bottom: 18px;
+                max-width: 200px;
+            }
+
+            .company-logo {
+                width: 70px;
+                height: 70px;
+                margin-bottom: 14px;
+            }
+
+            .company-logo svg {
+                width: 40px;
+                height: 40px;
+            }
+
+            .login-image h1 {
+                font-size: 18px;
+                margin-bottom: 7px;
+            }
+
+            .login-image p {
+                font-size: 12px;
+            }
+
+            .login-form-wrapper {
+                padding: 22px 20px;
+            }
+
+            .login-form-wrapper h2 {
+                font-size: 22px;
+            }
+
+            .login-form-wrapper .subtitle {
+                margin-bottom: 20px;
+            }
+
+            .form-group {
+                margin-bottom: 10px;
+            }
+
+            .form-group input {
+                padding: 11px;
+            }
+
+            .help-text {
+                margin-top: 12px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+                scroll-behavior: auto !important;
+            }
+
+            .login-btn:hover,
+            .modal-close-btn:hover {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-decoration" aria-hidden="true"></div>
+
+    <main class="login-container" id="loginContainer">
+        <section class="login-image" aria-label="브랜드 소개">
+            <div class="brand-content">
+                <div class="company-logo" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 7H4C2.89543 7 2 7.89543 2 9V19C2 20.1046 2.89543 21 4 21H20C21.1046 21 22 20.1046 22 19V9C22 7.89543 21.1046 7 20 7Z" stroke="#2a5298" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M16 21V5C16 4.46957 15.7893 3.96086 15.4142 3.58579C15.0391 3.21071 14.5304 3 14 3H10C9.46957 3 8.96086 3.21071 8.58579 3.58579C8.21071 3.96086 8 4.46957 8 5V21" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+				<div class="brand-text-panel">
+					<h1>채용컨설팅센터</h1>
+					<p>
+						<span class="brand-subtitle">HR Consulting Center</span><br>
+						<span class="brand-slogan">성공적인 채용을 위한 최적의 솔루션</span>
+					</p>
+				</div>
+            </div>
+        </section>
+
+        <section class="login-form-wrapper" aria-labelledby="loginTitle">
+            <h2 id="loginTitle">로그인</h2>
+            <p class="subtitle">인트라넷 시스템에 오신 것을 환영합니다</p>
+
+            <form id="loginForm" novalidate>
+                <div class="form-group">
+                    <label for="userId">아이디</label>
+                    <input
+                        type="text"
+                        id="userId"
+                        name="userId"
+                        placeholder="아이디를 입력하세요"
+                        autocomplete="username"
+                        autocapitalize="none"
+                        spellcheck="false"
+                        aria-describedby="userIdError"
+                        required
+                    />
+                    <p id="userIdError" class="field-error" aria-live="polite"></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">비밀번호</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="비밀번호를 입력하세요"
+                        autocomplete="current-password"
+                        aria-describedby="passwordError"
+                        required
+                    />
+                    <p id="passwordError" class="field-error" aria-live="polite"></p>
+                </div>
+
+                <button type="submit" class="login-btn" id="loginButton">로그인</button>
+
+                <p class="help-text">
+                    로그인에 문제가 있으신가요? <strong>인재경영팀(내선 729)</strong>에 문의하세요.
+                </p>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        (function () {
+            const loginForm = document.getElementById('loginForm');
+            const userIdInput = document.getElementById('userId');
+            const passwordInput = document.getElementById('password');
+            const loginButton = document.getElementById('loginButton');
+
+            const userIdError = document.getElementById('userIdError');
+            const passwordError = document.getElementById('passwordError');
+
+            let lastFocusedElement = null;
+
+            function setFieldError(input, errorElement, message) {
+                input.setAttribute('aria-invalid', 'true');
+                errorElement.textContent = message;
+                errorElement.classList.add('active');
+            }
+
+            function clearFieldError(input, errorElement) {
+                input.removeAttribute('aria-invalid');
+                errorElement.textContent = '';
+                errorElement.classList.remove('active');
+            }
+
+            function clearAllErrors() {
+                clearFieldError(userIdInput, userIdError);
+                clearFieldError(passwordInput, passwordError);
+            }
+
+            function validateForm() {
+                clearAllErrors();
+
+                const userIdValue = userIdInput.value.trim();
+                const passwordValue = passwordInput.value.trim();
+                let isValid = true;
+                let firstInvalidField = null;
+
+                if (!userIdValue) {
+                    setFieldError(userIdInput, userIdError, '아이디를 입력해 주세요.');
+                    isValid = false;
+                    firstInvalidField = firstInvalidField || userIdInput;
+                }
+
+                if (!passwordValue) {
+                    setFieldError(passwordInput, passwordError, '비밀번호를 입력해 주세요.');
+                    isValid = false;
+                    firstInvalidField = firstInvalidField || passwordInput;
+                }
+
+                if (!isValid && firstInvalidField) {
+                    firstInvalidField.focus();
+                }
+
+                return isValid;
+            }
+
+            function createModal() {
+                if (document.getElementById('modalOverlay')) {
+                    return;
+                }
+
+                const modalHTML = `
+                    <div
+                        id="modalOverlay"
+                        class="modal-overlay"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="modalTitle"
+                        aria-describedby="modalDescription"
+                        aria-hidden="true"
+                    >
+                        <div class="modal-content" tabindex="-1">
+                            <div class="modal-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2"></circle>
+                                    <path d="M12 8V12" stroke="white" stroke-width="2" stroke-linecap="round"></path>
+                                    <circle cx="12" cy="16" r="1" fill="white"></circle>
+                                </svg>
+                            </div>
+                            <h3 id="modalTitle">로그인 실패</h3>
+                            <p id="modalDescription">
+                                아이디와 비밀번호를 확인하십시오.<br>
+                                아이디 신규 생성 및 로그인 관련 문의는<br>
+                                인재경영팀(내선 729)으로 연락바랍니다.
+                            </p>
+                            <button type="button" class="modal-close-btn" id="modalCloseBtn">확인</button>
+                        </div>
+                    </div>
+                `;
+
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+                const modalOverlay = document.getElementById('modalOverlay');
+                const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+                modalCloseBtn.addEventListener('click', closeModal);
+
+                modalOverlay.addEventListener('click', function (e) {
+                    if (e.target === modalOverlay) {
+                        closeModal();
+                    }
+                });
+            }
+
+            function getModalElements() {
+                return {
+                    overlay: document.getElementById('modalOverlay'),
+                    content: document.querySelector('#modalOverlay .modal-content'),
+                    closeBtn: document.getElementById('modalCloseBtn')
+                };
+            }
+
+            function getFocusableElements(container) {
+                if (!container) return [];
+                return container.querySelectorAll(
+                    'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+                );
+            }
+
+            function openModal() {
+                createModal();
+
+                const { overlay, closeBtn } = getModalElements();
+                if (!overlay) return;
+
+                lastFocusedElement = document.activeElement;
+
+                overlay.classList.add('active');
+                overlay.setAttribute('aria-hidden', 'false');
+                document.body.classList.add('modal-open');
+
+                if (closeBtn) {
+                    closeBtn.focus();
+                }
+            }
+
+            function closeModal() {
+                const { overlay } = getModalElements();
+                if (!overlay) return;
+
+                overlay.classList.remove('active');
+                overlay.setAttribute('aria-hidden', 'true');
+                document.body.classList.remove('modal-open');
+
+                if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+                    lastFocusedElement.focus();
+                } else {
+                    loginButton.focus();
+                }
+            }
+
+            function setLoadingState(isLoading) {
+                loginButton.disabled = isLoading;
+                loginButton.setAttribute('aria-busy', String(isLoading));
+                loginButton.textContent = isLoading ? '확인 중...' : '로그인';
+            }
+
+            function simulateLoginFailure() {
+                setLoadingState(true);
+
+                window.setTimeout(function () {
+                    setLoadingState(false);
+                    openModal();
+                }, 350);
+            }
+
+            loginForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                if (!validateForm()) {
+                    return;
+                }
+
+                simulateLoginFailure();
+            });
+
+            userIdInput.addEventListener('input', function () {
+                if (userIdInput.value.trim()) {
+                    clearFieldError(userIdInput, userIdError);
+                }
+            });
+
+            passwordInput.addEventListener('input', function () {
+                if (passwordInput.value.trim()) {
+                    clearFieldError(passwordInput, passwordError);
+                }
+            });
+
+            document.addEventListener('keydown', function (e) {
+                const { overlay, content } = getModalElements();
+                const isModalOpen = overlay && overlay.classList.contains('active');
+
+                if (!isModalOpen) {
+                    return;
+                }
+
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    closeModal();
+                    return;
+                }
+
+                if (e.key === 'Tab') {
+                    const focusableElements = getFocusableElements(content);
+
+                    if (!focusableElements.length) {
+                        e.preventDefault();
+                        return;
+                    }
+
+                    const firstElement = focusableElements[0];
+                    const lastElement = focusableElements[focusableElements.length - 1];
+
+                    if (e.shiftKey && document.activeElement === firstElement) {
+                        e.preventDefault();
+                        lastElement.focus();
+                    } else if (!e.shiftKey && document.activeElement === lastElement) {
+                        e.preventDefault();
+                        firstElement.focus();
+                    }
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
